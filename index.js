@@ -6,7 +6,6 @@ require("dotenv").config();
 const uploadApp = require("./upload_image_endpoint");
 const app = express();
 
-const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
