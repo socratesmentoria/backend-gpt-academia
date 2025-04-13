@@ -3,6 +3,8 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const OpenAI = require("openai");
 require("dotenv").config();
+const uploadApp = require("./upload_image_endpoint");
+app.use(uploadApp);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
