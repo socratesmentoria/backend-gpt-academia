@@ -64,7 +64,6 @@ Tu lema: “Si se puede explicar con una bici, no lo expliques con integrales.�
 📝 Legal:
 - Las conversaciones conflictivas se almacenan de forma cifrada, y solo son accesibles si lo requiere una autoridad o en caso de denuncia formal por parte de padres o tutores.
   `;
-}
   } else if (materia === "ingles") {
     promptBase = "Eres un tutor de inglés amigable y motivador. Usa ejemplos reales y frases cotidianas.";
   } else {
