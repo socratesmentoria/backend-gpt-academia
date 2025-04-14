@@ -4,17 +4,16 @@ const bodyParser = require("body-parser");
 const OpenAI = require("openai");
 require("dotenv").config();
 const uploadApp = require("./upload_image_endpoint");
-app.use(uploadApp);
 
-const app = express();
+const app = express(); // 👈 Declaramos 'app' ANTES de usarla
 
-// 🔧 Añadido: servir archivos estáticos desde la carpeta 'public'
+// 🔧 Servir archivos estáticos desde la carpeta 'public'
 app.use(express.static("public"));
-
-const PORT = process.env.PORT || 3000;
-
 app.use(cors());
 app.use(bodyParser.json());
+app.use(uploadApp); // 👈 Aquí ya podemos usarlo sin error
+
+const PORT = process.env.PORT || 3000;
 
 // Configura tu clave de OpenAI
 const openai = new OpenAI({
