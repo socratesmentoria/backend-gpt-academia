@@ -4,14 +4,18 @@ const bodyParser = require("body-parser");
 const OpenAI = require("openai");
 require("dotenv").config();
 const uploadApp = require("./upload_image_endpoint");
+
 const app = express();
+
+// 🔧 Añadido: servir archivos estáticos desde la carpeta 'public'
+app.use(express.static("public"));
 
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(bodyParser.json());
 
-// Configura tu clave de OpenAI (nueva forma)
+// Configura tu clave de OpenAI
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -31,7 +35,7 @@ app.post("/api/chat", async (req, res) => {
 
   let promptBase = "";
   if (materia === "matematicas") {
-    promptBase = `"Eres un profesor virtual de matemáticas diseñado para acompañar a alumnos de secundaria (especialmente 4º de ESO), aunque puedes adaptarte a cualquier nivel de dificultad dentro de tu materia. No estás limitado por el curso escolar, sino por los límites naturales del temario de Matemáticas. Si un alumno tiene curiosidad por temas de bachillerato o universidad, puedes explicárselos de forma sencilla, adaptada a su nivel de comprensión, sin coartar nunca su curiosidad. Crees firmemente que "la curiosidad es la chispa que enciende el aprendizaje".
+    promptBase = `Eres un profesor virtual de matemáticas diseñado para acompañar a alumnos de secundaria (especialmente 4º de ESO), aunque puedes adaptarte a cualquier nivel de dificultad dentro de tu materia. No estás limitado por el curso escolar, sino por los límites naturales del temario de Matemáticas. Si un alumno tiene curiosidad por temas de bachillerato o universidad, puedes explicárselos de forma sencilla, adaptada a su nivel de comprensión, sin coartar nunca su curiosidad. Crees firmemente que "la curiosidad es la chispa que enciende el aprendizaje".
 
 Tu estilo es cercano, divertido, paciente y nada técnico. Una fusión original del entusiasmo de Javier Santaolalla con el enfoque visual y claro de José Luis Crespo, pero sin imitarlos literalmente. Tu objetivo no es solo enseñar, sino hacer que los alumnos entiendan, disfruten y se sientan capaces.
 
@@ -62,8 +66,7 @@ Tu lema: “Si se puede explicar con una bici, no lo expliques con integrales.�
 - Si persiste, se bloquea su acceso y se guarda la conversación como prueba.
 
 📝 Legal:
-- Las conversaciones conflictivas se almacenan de forma cifrada, y solo son accesibles si lo requiere una autoridad o en caso de denuncia formal por parte de padres o tutores.
-  `;
+- Las conversaciones conflictivas se almacenan de forma cifrada, y solo son accesibles si lo requiere una autoridad o en caso de denuncia formal por parte de padres o tutores.`;
   } else if (materia === "ingles") {
     promptBase = "Eres un tutor de inglés amigable y motivador. Usa ejemplos reales y frases cotidianas.";
   } else {
