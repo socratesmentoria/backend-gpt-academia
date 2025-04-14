@@ -20,12 +20,13 @@
       background: #e3f2fd;
       border-radius: 8px;
       color: #1a237e;
+      white-space: pre-wrap;
       display: none;
     }
   </style>
 </head>
 <body>
-  <h1>📷 Sube tu ejercicio</h1>
+  <h1>📷 Sube tu ejercicio (modo DEBUG)</h1>
 
   <input type="file" id="imagen" accept="image/*"><br>
   <button onclick="subirImagen()">Enviar al profe</button>
@@ -43,32 +44,38 @@
       const formData = new FormData();
       formData.append("imagen", archivo);
 
-      const subir = await fetch("/api/upload-image", {
-        method: "POST",
-        body: formData
-      });
-
-      const subirRes = await subir.json();
-
-      if (subir.ok) {
-        const nombre_archivo = subirRes.filename || archivo.name;
-
-        const analizar = await fetch("/api/chat-con-imagen", {
+      try {
+        const subir = await fetch("/api/upload-image", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            usuario_id: "alumno_demo",
-            nombre_archivo: nombre_archivo
-          })
+          body: formData
         });
 
-        const resultado = await analizar.json();
+        const subirRes = await subir.json();
+
+        if (subir.ok) {
+          const nombre_archivo = subirRes.filename || archivo.name;
+
+          const analizar = await fetch("/api/chat-con-imagen", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              usuario_id: "alumno_demo",
+              nombre_archivo: nombre_archivo
+            })
+          });
+
+          const resultado = await analizar.json();
+          document.getElementById("respuesta").style.display = "block";
+          document.getElementById("respuesta").innerText = JSON.stringify(resultado, null, 2);
+        } else {
+          alert("❌ Error al subir la imagen.");
+        }
+      } catch (err) {
         document.getElementById("respuesta").style.display = "block";
-        document.getElementById("respuesta").innerText = resultado.respuesta || "Sin respuesta.";
-      } else {
-        alert("❌ Error al subir la imagen.");
+        document.getElementById("respuesta").innerText = "⚠️ Error de red o servidor:
+" + err;
       }
     }
   </script>
