@@ -1,0 +1,73 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sube tu ejercicio</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f2f2f2;
+      padding: 2rem;
+      text-align: center;
+    }
+    h1 {
+      color: #333;
+    }
+    form {
+      margin-top: 2rem;
+    }
+    input[type="file"] {
+      display: block;
+      margin: 1rem auto;
+    }
+    button {
+      padding: 0.7rem 1.5rem;
+      font-size: 1rem;
+      background-color: #0077cc;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+    #mensaje {
+      margin-top: 1.5rem;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>📸 Sube tu ejercicio</h1>
+  <p>Haz una foto clara del enunciado y súbela para que el profe la vea</p>
+  <form id="formulario">
+    <input type="file" name="imagen" accept="image/*" required>
+    <button type="submit">Subir imagen</button>
+  </form>
+  <div id="mensaje"></div>
+
+  <script>
+    const form = document.getElementById("formulario");
+    const mensaje = document.getElementById("mensaje");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+      mensaje.textContent = "Subiendo imagen...";
+
+      try {
+        const res = await fetch("/upload-image?uid=alumno-demo", {
+          method: "POST",
+          body: formData
+        });
+        if (res.ok) {
+          mensaje.innerHTML = "✅ Imagen subida con éxito. Puedes volver al ordenador.";
+        } else {
+          mensaje.innerHTML = "❌ Error al subir la imagen.";
+        }
+      } catch (err) {
+        mensaje.innerHTML = "❌ Fallo de conexión con el servidor.";
+      }
+    });
+  </script>
+</body>
+</html>
