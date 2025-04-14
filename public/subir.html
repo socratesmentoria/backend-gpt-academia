@@ -1,95 +1,75 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Subir ejercicio</title>
+  <meta charset="UTF-8" />
+  <title>Sube tu ejercicio</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       padding: 2rem;
-      background-color: #f9f9f9;
       text-align: center;
-    }
-    h1 {
-      color: #333;
-    }
-    #preview {
-      margin-top: 1rem;
-      max-width: 90%;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    button {
-      margin-top: 1rem;
-      padding: 0.8rem 1.5rem;
-      font-size: 1rem;
-      background-color: #0077cc;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #005fa3;
+      background: #f7f9fc;
     }
     input[type="file"] {
+      margin-bottom: 1rem;
+    }
+    #respuesta {
       margin-top: 1.5rem;
+      padding: 1rem;
+      background: #e3f2fd;
+      border-radius: 8px;
+      color: #1a237e;
+      display: none;
     }
   </style>
 </head>
 <body>
   <h1>📷 Sube tu ejercicio</h1>
-  <p>Haz una foto desde tu móvil o súbela desde la galería</p>
-  <form id="formulario" enctype="multipart/form-data">
-    <input type="file" accept="image/*" capture="environment" id="imagen" name="imagen" required>
-    <br>
-    <img id="preview" src="#" alt="Vista previa" style="display:none;">
-    <br>
-    <button type="submit">Enviar al profe</button>
-  </form>
-  <p style="margin-top: 1rem; font-size: 0.9rem; color: #777;">
-    Recuerda: esta imagen se usará solo para ayudarte con tus dudas 💬
-  </p>
+
+  <input type="file" id="imagen" accept="image/*"><br>
+  <button onclick="subirImagen()">Enviar al profe</button>
+
+  <div id="respuesta"></div>
+
   <script>
-    const input = document.getElementById('imagen');
-    const preview = document.getElementById('preview');
-    const form = document.getElementById('formulario');
-
-    input.addEventListener('change', () => {
-      const file = input.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = e => {
-          preview.src = e.target.result;
-          preview.style.display = 'block';
-        };
-        reader.readAsDataURL(file);
+    async function subirImagen() {
+      const archivo = document.getElementById("imagen").files[0];
+      if (!archivo) {
+        alert("Selecciona una imagen primero");
+        return;
       }
-    });
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
       const formData = new FormData();
-      formData.append("imagen", input.files[0]);
-      try {
-        const res = await fetch("/api/upload-image", {
+      formData.append("imagen", archivo);
+
+      const subir = await fetch("/api/upload-image", {
+        method: "POST",
+        body: formData
+      });
+
+      const subirRes = await subir.json();
+
+      if (subir.ok) {
+        const nombre_archivo = subirRes.filename || archivo.name;
+
+        const analizar = await fetch("/api/chat-con-imagen", {
           method: "POST",
-          body: formData
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            usuario_id: "alumno_demo",
+            nombre_archivo: nombre_archivo
+          })
         });
-        if (res.ok) {
-          alert("✅ Imagen enviada correctamente. Tu profe la está revisando.");
-          form.reset();
-          preview.style.display = 'none';
-        } else {
-          alert("❌ Error al subir la imagen.");
-        }
-      } catch (err) {
-        console.error(err);
-        alert("❌ Fallo de conexión.");
+
+        const resultado = await analizar.json();
+        document.getElementById("respuesta").style.display = "block";
+        document.getElementById("respuesta").innerText = resultado.respuesta || "Sin respuesta.";
+      } else {
+        alert("❌ Error al subir la imagen.");
       }
-    });
+    }
   </script>
 </body>
 </html>
