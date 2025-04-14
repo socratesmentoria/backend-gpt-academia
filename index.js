@@ -4,23 +4,22 @@ const bodyParser = require("body-parser");
 const OpenAI = require("openai");
 require("dotenv").config();
 const uploadApp = require("./upload_image_endpoint");
+const visionApp = require("./chat_con_imagen"); // ✅ Añadido para imágenes con IA
 
-const app = express(); // 👈 Declaramos 'app' ANTES de usarla
+const app = express();
 
-// 🔧 Servir archivos estáticos desde la carpeta 'public'
 app.use(express.static("public"));
 app.use(cors());
 app.use(bodyParser.json());
-app.use(uploadApp); // 👈 Aquí ya podemos usarlo sin error
+app.use(uploadApp);
+app.use(visionApp); // ✅ Activamos la ruta /api/chat-con-imagen
 
 const PORT = process.env.PORT || 3000;
 
-// Configura tu clave de OpenAI
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Simulación de base de datos en memoria
 const historialUsuarios = {};
 
 app.post("/api/chat", async (req, res) => {
