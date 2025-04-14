@@ -1,32 +1,36 @@
+
 const express = require("express");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
-const router = express.Router();
+const uploadApp = express.Router();
 
-// Configuración para guardar archivos temporalmente
+// Configuración de almacenamiento con multer
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    const dir = path.join(__dirname, "uploads");
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir);
-    cb(null, dir);
+    const uploadDir = path.join(__dirname, "uploads");
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir);
+    }
+    cb(null, uploadDir);
   },
   filename: function (req, file, cb) {
-    const uid = req.query.uid || "anonimo";
-    const timestamp = Date.now();
-    const ext = path.extname(file.originalname);
-    cb(null, `${uid}_${timestamp}${ext}`);
-  },
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1E9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
+  }
 });
 
-const upload = multer({ storage });
+const upload = multer({ storage: storage });
 
-// Ruta para subir imágenes
-router.post("/upload-image", upload.single("imagen"), (req, res) => {
-  const uid = req.query.uid || "anonimo";
-  console.log(`📸 Imagen recibida de ${uid}:`, req.file.filename);
-  res.send(`<h2>✅ Imagen subida correctamente</h2><p>Puedes cerrar esta página.</p>`);
+// Ruta POST para recibir la imagen
+uploadApp.post("/api/upload-image", upload.single("imagen"), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: "No se subió ninguna imagen." });
+  }
+
+  console.log("Imagen recibida:", req.file.filename);
+  res.json({ mensaje: "Imagen recibida correctamente." });
 });
 
-module.exports = router;
+module.exports = uploadApp;
