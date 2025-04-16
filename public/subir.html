@@ -1,1 +1,44 @@
 
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Subir Ejercicio</title>
+</head>
+<body>
+  <h2>Sube una imagen con tu ejercicio de mates</h2>
+  <form id="formulario" enctype="multipart/form-data">
+    <input type="file" id="foto" name="foto" accept="image/*" required />
+    <button type="submit">Enviar</button>
+  </form>
+  <p id="respuesta"></p>
+
+  <script>
+    document.getElementById("formulario").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const formData = new FormData();
+      const archivo = document.getElementById("foto").files[0];
+      formData.append("foto", archivo);
+
+      const subida = await fetch("/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const subidaJson = await subida.json();
+      if (!subidaJson.filename) {
+        document.getElementById("respuesta").innerText = "❌ Error al subir imagen";
+        return;
+      }
+
+      const analisis = await fetch("/api/chat_imagen", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ imagenPath: "upload/" + subidaJson.filename })
+      });
+
+      const respuestaIA = await analisis.json();
+      document.getElementById("respuesta").innerText = respuestaIA.respuesta || "❌ Error general: " + respuestaIA.error;
+    });
+  </script>
+</body>
+</html>
