@@ -3,7 +3,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Subida solo imagen (debug)</title>
+  <title>Subida y análisis GPT</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -14,23 +14,23 @@
     #respuesta {
       margin-top: 2rem;
       padding: 1rem;
-      background: #fff3cd;
+      background: #e8f5e9;
       border-radius: 8px;
       white-space: pre-wrap;
-      color: #856404;
+      color: #1b5e20;
       display: none;
     }
   </style>
 </head>
 <body>
-  <h1>🧪 Prueba solo subida de imagen</h1>
+  <h1>🧠 Subir imagen y preguntar al profe IA</h1>
   <input type="file" id="imagen" accept="image/*"><br><br>
-  <button onclick="subir()">Subir imagen</button>
+  <button onclick="subirYPreguntar()">Enviar al profe</button>
 
   <div id="respuesta"></div>
 
   <script>
-    async function subir() {
+    async function subirYPreguntar() {
       const archivo = document.getElementById("imagen").files[0];
       if (!archivo) {
         alert("Selecciona una imagen primero");
@@ -48,13 +48,37 @@
 
         const subirRes = await subir.json();
 
+        if (!subir.ok && !subirRes.filename) {
+          throw new Error("Error al subir imagen");
+        }
+
+        const nombre_archivo = subirRes.filename;
+
+        const analizar = await fetch("/api/chat-con-imagen", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            usuario_id: "alumno_demo",
+            nombre_archivo: nombre_archivo
+          })
+        });
+
+        const resultado = await analizar.json();
+
         document.getElementById("respuesta").style.display = "block";
-        document.getElementById("respuesta").innerText =
-          "✅ Imagen subida correctamente\nNombre: " + subirRes.filename;
+        if (analizar.ok) {
+          document.getElementById("respuesta").innerText = resultado.respuesta || JSON.stringify(resultado, null, 2);
+        } else {
+          document.getElementById("respuesta").innerText = "⚠️ Error GPT:
+" + JSON.stringify(resultado, null, 2);
+        }
+
       } catch (err) {
         document.getElementById("respuesta").style.display = "block";
-        document.getElementById("respuesta").innerText =
-          "❌ Error al subir la imagen: " + err;
+        document.getElementById("respuesta").innerText = "❌ Error general:
+" + err;
       }
     }
   </script>
