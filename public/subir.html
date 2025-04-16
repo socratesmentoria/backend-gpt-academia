@@ -1,0 +1,81 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Subir ejercicio al profesor IA</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      padding: 2rem;
+      background: #f9f9f9;
+      text-align: center;
+    }
+    #respuesta {
+      margin-top: 2rem;
+      padding: 1rem;
+      background: #e3f2fd;
+      border-radius: 8px;
+      white-space: pre-wrap;
+      color: #0d47a1;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>📸 Subir ejercicio al profe IA</h1>
+  <input type="file" id="imagen" accept="image/*"><br><br>
+  <button onclick="enviarImagen()">Enviar imagen</button>
+
+  <div id="respuesta"></div>
+
+  <script>
+    async function enviarImagen() {
+      const archivo = document.getElementById("imagen").files[0];
+      if (!archivo) {
+        alert("Selecciona una imagen primero");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("imagen", archivo);
+
+      try {
+        const subir = await fetch("/api/upload-image", {
+          method: "POST",
+          body: formData
+        });
+
+        const subirRes = await subir.json();
+
+        if (subir.ok || subir.status === 200) {
+          const nombre_archivo = subirRes.filename || archivo.name;
+
+          const analizar = await fetch("/api/chat-con-imagen", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              usuario_id: "alumno_demo",
+              nombre_archivo: nombre_archivo
+            })
+          });
+
+          const resultado = await analizar.json();
+
+          document.getElementById("respuesta").style.display = "block";
+          document.getElementById("respuesta").innerText = JSON.stringify(resultado, null, 2);
+        } else {
+          document.getElementById("respuesta").style.display = "block";
+          document.getElementById("respuesta").innerText = "❌ Error al subir imagen.";
+        }
+      } catch (err) {
+        document.getElementById("respuesta").style.display = "block";
+        document.getElementById("respuesta").innerText = "⚠️ Error en la conexión:
+" + err;
+      }
+    }
+  </script>
+</body>
+</html>
