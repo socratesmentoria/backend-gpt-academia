@@ -5,7 +5,6 @@ const bodyParser = require("body-parser");
 const OpenAI = require("openai");
 require("dotenv").config();
 const uploadApp = require("./upload_image_endpoint");
-const chatImagenRouter = require("./chat_con_imagen");
 
 const app = express();
 
@@ -13,7 +12,6 @@ app.use(express.static("public"));
 app.use(cors());
 app.use(bodyParser.json());
 app.use(uploadApp);
-app.use(chatImagenRouter);
 
 const PORT = process.env.PORT || 3000;
 
@@ -35,9 +33,9 @@ app.post("/api/chat", async (req, res) => {
 
   let promptBase = "";
   if (materia === "matematicas") {
-    promptBase = "Eres un profesor de matemáticas...";
+    promptBase = `Eres un profesor virtual de matemáticas...`;
   } else if (materia === "ingles") {
-    promptBase = "Eres un tutor de inglés amigable y motivador. Usa ejemplos reales y frases cotidianas.";
+    promptBase = "Eres un tutor de inglés amigable y motivador.";
   } else {
     promptBase = "Eres un profesor virtual paciente y claro.";
   }
