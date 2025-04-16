@@ -1,0 +1,57 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Test de subida de imagen</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      padding: 2rem;
+      text-align: center;
+      background: #f4f6f8;
+    }
+    #respuesta {
+      margin-top: 2rem;
+      padding: 1rem;
+      background: #e0f7fa;
+      border-radius: 8px;
+      display: none;
+      color: #006064;
+    }
+  </style>
+</head>
+<body>
+  <h1>📤 Test de subida de imagen</h1>
+  <input type="file" id="imagen" accept="image/*"><br><br>
+  <button onclick="subirImagen()">Subir imagen</button>
+  <div id="respuesta"></div>
+
+  <script>
+    async function subirImagen() {
+      const archivo = document.getElementById("imagen").files[0];
+      if (!archivo) {
+        alert("Selecciona una imagen primero");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("imagen", archivo);
+
+      try {
+        const response = await fetch("/api/upload-image", {
+          method: "POST",
+          body: formData
+        });
+
+        const result = await response.json();
+        document.getElementById("respuesta").style.display = "block";
+        document.getElementById("respuesta").innerText = JSON.stringify(result, null, 2);
+      } catch (err) {
+        document.getElementById("respuesta").style.display = "block";
+        document.getElementById("respuesta").innerText = "❌ Error: " + err;
+      }
+    }
+  </script>
+</body>
+</html>
