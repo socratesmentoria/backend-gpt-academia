@@ -3,34 +3,34 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Subir ejercicio al profesor IA</title>
+  <title>Subida solo imagen (debug)</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
       padding: 2rem;
-      background: #f9f9f9;
+      background: #f0f0f0;
       text-align: center;
     }
     #respuesta {
       margin-top: 2rem;
       padding: 1rem;
-      background: #e3f2fd;
+      background: #fff3cd;
       border-radius: 8px;
       white-space: pre-wrap;
-      color: #0d47a1;
+      color: #856404;
       display: none;
     }
   </style>
 </head>
 <body>
-  <h1>📸 Subir ejercicio al profe IA</h1>
+  <h1>🧪 Prueba solo subida de imagen</h1>
   <input type="file" id="imagen" accept="image/*"><br><br>
-  <button onclick="enviarImagen()">Enviar imagen</button>
+  <button onclick="subir()">Subir imagen</button>
 
   <div id="respuesta"></div>
 
   <script>
-    async function enviarImagen() {
+    async function subir() {
       const archivo = document.getElementById("imagen").files[0];
       if (!archivo) {
         alert("Selecciona una imagen primero");
@@ -48,32 +48,13 @@
 
         const subirRes = await subir.json();
 
-        if (subir.ok || subir.status === 200) {
-          const nombre_archivo = subirRes.filename || archivo.name;
-
-          const analizar = await fetch("/api/chat-con-imagen", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              usuario_id: "alumno_demo",
-              nombre_archivo: nombre_archivo
-            })
-          });
-
-          const resultado = await analizar.json();
-
-          document.getElementById("respuesta").style.display = "block";
-          document.getElementById("respuesta").innerText = JSON.stringify(resultado, null, 2);
-        } else {
-          document.getElementById("respuesta").style.display = "block";
-          document.getElementById("respuesta").innerText = "❌ Error al subir imagen.";
-        }
+        document.getElementById("respuesta").style.display = "block";
+        document.getElementById("respuesta").innerText =
+          "✅ Imagen subida correctamente\nNombre: " + subirRes.filename;
       } catch (err) {
         document.getElementById("respuesta").style.display = "block";
-        document.getElementById("respuesta").innerText = "⚠️ Error en la conexión:
-" + err;
+        document.getElementById("respuesta").innerText =
+          "❌ Error al subir la imagen: " + err;
       }
     }
   </script>
