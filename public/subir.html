@@ -71,14 +71,12 @@
         if (analizar.ok) {
           document.getElementById("respuesta").innerText = resultado.respuesta || JSON.stringify(resultado, null, 2);
         } else {
-          document.getElementById("respuesta").innerText = "⚠️ Error GPT:
-" + JSON.stringify(resultado, null, 2);
+          document.getElementById("respuesta").innerText = "⚠️ Error GPT:\n" + JSON.stringify(resultado, null, 2);
         }
 
       } catch (err) {
         document.getElementById("respuesta").style.display = "block";
-        document.getElementById("respuesta").innerText = "❌ Error general:
-" + err;
+        document.getElementById("respuesta").innerText = "❌ Error general:\n" + err;
       }
     }
   </script>
