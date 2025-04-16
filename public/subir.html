@@ -3,41 +3,29 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Subir Ejercicio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Subir ejercicio</title>
 </head>
-<body>
-  <h2>Sube una imagen con tu ejercicio de mates</h2>
-  <form id="formulario" enctype="multipart/form-data">
-    <input type="file" id="foto" name="foto" accept="image/*" required />
-    <button type="submit">Enviar</button>
+<body style="font-family: 'Segoe UI'; text-align: center; padding: 2rem;">
+  <h2>📸 Sube tu ejercicio de mates</h2>
+  <form id="formularioImagen">
+    <input type="file" name="imagen" accept="image/*" required />
+    <button type="submit">Enviar al profe</button>
   </form>
-  <p id="respuesta"></p>
+  <div id="respuesta" style="margin-top: 2rem;"></div>
 
   <script>
-    document.getElementById("formulario").addEventListener("submit", async (e) => {
+    document.getElementById("formularioImagen").addEventListener("submit", async (e) => {
       e.preventDefault();
-      const formData = new FormData();
-      const archivo = document.getElementById("foto").files[0];
-      formData.append("foto", archivo);
+      const formData = new FormData(e.target);
 
-      const subida = await fetch("/upload", {
+      const res = await fetch("/subir", {
         method: "POST",
         body: formData,
       });
-      const subidaJson = await subida.json();
-      if (!subidaJson.filename) {
-        document.getElementById("respuesta").innerText = "❌ Error al subir imagen";
-        return;
-      }
 
-      const analisis = await fetch("/api/chat_imagen", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ imagenPath: "upload/" + subidaJson.filename })
-      });
-
-      const respuestaIA = await analisis.json();
-      document.getElementById("respuesta").innerText = respuestaIA.respuesta || "❌ Error general: " + respuestaIA.error;
+      const text = await res.text();
+      document.getElementById("respuesta").innerHTML = text;
     });
   </script>
 </body>
